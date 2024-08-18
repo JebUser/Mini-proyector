@@ -1,6 +1,12 @@
 import streamlit as st
 
-st.title("🎈 My new app")
-st.write(
-    "Let's start building! For help and inspiration, head over to [docs.streamlit.io](https://docs.streamlit.io/)."
-)
+
+pg = st.navigation([
+    st.Page("interfaces/Historial.py", title="Historial de Ventas"),
+    st.Page("interfaces/Registrar_ventas.py", title="Venta"),
+    st.Page("interfaces/Login.py", title="Login")
+])
+
+st.set_page_config(page_title="POS", page_icon=":material/edit:")
+
+pg.run()
