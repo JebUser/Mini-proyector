@@ -1,5 +1,6 @@
 import streamlit as st
 from connection import connect
+
 tab1, tab2, tab3,tab4 = st.tabs(["Till", "Sales", "Reports","Settings"])
 
 with tab1:
@@ -22,8 +23,6 @@ with tab1:
                     prompt_name = st.text_input("Hello",value="",placeholder="Enter Stock Name",label_visibility="collapsed") # Buscar por nombre.
                 with col3:
                     submitname = st.form_submit_button("Find")
-
-
 
     with st.container():
         refresh = st.button("Refresh")

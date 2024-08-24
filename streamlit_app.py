@@ -7,6 +7,6 @@ pg = st.navigation([
     st.Page("interfaces/Login.py", title="Login")
 ])
 
-st.set_page_config(page_title="POS", page_icon=":material/edit:")
+st.set_page_config(page_title="JavePOS", page_icon=":material/edit:")
 
 pg.run()
