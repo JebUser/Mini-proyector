@@ -35,17 +35,17 @@ with st.container():
     search_button = st.button("Search")
     if search_button:
         if (sale_date) and (sale_product != "") and (sale_vendor != ""):
-            data = connect.query(f"SELECT v.fecha, p.nombre, u.usuario, v.cantidad FROM venta v JOIN productos p ON v.productos_id = p.id JOIN usuarios u ON v.usuarios_id = u.id WHERE v.fecha=\"{sale_date}\" AND p.nombre=\"{sale_product}\" AND u.usuario=\"{sale_vendor}\"") # Cargar ventas por fecha, nombre de producto y username del vendedor
+            data = connect.query(f"SELECT v.NroVenta, v.fecha, p.nombre, u.usuario AS vendedor, c.Nombre AS cliente, v.cantidad, CONCAT('$',(v.cantidad*p.precio)) AS total FROM Venta v JOIN productos p ON v.IDProducto = p.id JOIN usuarios u ON v.IDEmpleado = u.id JOIN Cliente c ON v.Comprador = c.Cedula WHERE v.fecha=\"{sale_date}\" AND p.nombre=\"{sale_product}\" AND u.usuario=\"{sale_vendor}\"") # Cargar ventas por fecha, nombre de producto y username del vendedor
             st.dataframe(data)
         elif (sale_date) and (sale_product != ""):
-            data = connect.query(f"SELECT v.fecha, p.nombre, u.usuario, v.cantidad FROM venta v JOIN productos p ON v.productos_id = p.id JOIN usuarios u ON v.usuarios_id = u.id WHERE v.fecha=\"{sale_date}\" AND p.nombre=\"{sale_product}\"") # Cargar ventas por fecha y nombre de producto
+            data = connect.query(f"SELECT v.NroVenta, v.fecha, p.nombre, u.usuario AS vendedor, c.Nombre AS cliente, v.cantidad, CONCAT('$',(v.cantidad*p.precio)) AS total FROM Venta v JOIN productos p ON v.IDProducto = p.id JOIN usuarios u ON v.IDEmpleado = u.id JOIN Cliente c ON v.Comprador = c.Cedula WHERE v.fecha=\"{sale_date}\" AND p.nombre=\"{sale_product}\"") # Cargar ventas por fecha y nombre de producto
             st.dataframe(data)
         elif (sale_date) and (sale_vendor != ""):
-            data = connect.query(f"SELECT v.fecha, p.nombre, u.usuario, v.cantidad FROM venta v JOIN productos p ON v.productos_id = p.id JOIN usuarios u ON v.usuarios_id = u.id WHERE v.fecha=\"{sale_date}\" AND u.usuario=\"{sale_vendor}\"") # Cargar ventas por fecha y username de vendedor
+            data = connect.query(f"SELECT v.NroVenta, v.fecha, p.nombre, u.usuario AS vendedor, c.Nombre AS cliente, v.cantidad, CONCAT('$',(v.cantidad*p.precio)) AS total FROM Venta v JOIN productos p ON v.IDProducto = p.id JOIN usuarios u ON v.IDEmpleado = u.id JOIN Cliente c ON v.Comprador = c.Cedula WHERE v.fecha=\"{sale_date}\" AND u.usuario=\"{sale_vendor}\"") # Cargar ventas por fecha y username de vendedor
             st.dataframe(data)
         elif (sale_date):
-            data = connect.query(f"SELECT v.fecha, p.nombre, u.usuario, v.cantidad FROM venta v JOIN productos p ON v.productos_id = p.id JOIN usuarios u ON v.usuarios_id = u.id WHERE v.fecha=\"{sale_date}\"") # Cargar ventas por fecha
+            data = connect.query(f"SELECT v.NroVenta, v.fecha, p.nombre, u.usuario AS vendedor, c.Nombre AS cliente, v.cantidad, CONCAT('$',(v.cantidad*p.precio)) AS total FROM Venta v JOIN productos p ON v.IDProducto = p.id JOIN usuarios u ON v.IDEmpleado = u.id JOIN Cliente c ON v.Comprador = c.Cedula WHERE v.fecha=\"{sale_date}\"") # Cargar ventas por fecha
             st.dataframe(data)
         else:
-            data = connect.query(f"SELECT v.fecha, p.nombre, u.usuario, v.cantidad FROM venta v JOIN productos p ON v.productos_id = p.id JOIN usuarios u ON v.usuarios_id = u.id") # Cargar todas las ventas
+            data = connect.query(f"SELECT v.NroVenta, v.fecha, p.nombre, u.usuario AS vendedor, c.Nombre AS cliente, v.cantidad, CONCAT('$',(v.cantidad*p.precio)) AS total FROM Venta v JOIN productos p ON v.IDProducto = p.id JOIN usuarios u ON v.IDEmpleado = u.id JOIN Cliente c ON v.Comprador = c.Cedula") # Cargar todas las ventas
             st.dataframe(data)
