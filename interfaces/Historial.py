@@ -30,43 +30,25 @@ with st.container():
         with col2:
             sale_vendor = st.text_input("Hello",value="",placeholder="Enter username of vendor",label_visibility="collapsed") # Buscar por nombre de vendedor 
 
-# Botón de busqueda con lógica de filtros
-# TODO: Buscar una manera de des-espaguetificar la lógica de condicionales de los filtros
 with st.container():
     search_button = st.button("Search")
+    data = None
+    query = "SELECT v.NroVenta, v.fecha, p.nombre, u.usuario AS vendedor, c.Nombre AS cliente, v.cantidad, CONCAT('$',(v.cantidad*p.precio)) AS total FROM Venta v JOIN productos p ON v.IDProducto = p.id JOIN usuarios u ON v.IDEmpleado = u.id JOIN Cliente c ON v.Comprador = c.Cedula" # Query por defecto.
+    
     if search_button:
-        if (sale_date) and (sale_price != 0.0) and (sale_product != "") and (sale_vendor != ""): #1111
-            data = connect.query(f"SELECT v.NroVenta, v.fecha, p.nombre, u.usuario AS vendedor, c.Nombre AS cliente, v.cantidad, CONCAT('$',(v.cantidad*p.precio)) AS total FROM Venta v JOIN productos p ON v.IDProducto = p.id JOIN usuarios u ON v.IDEmpleado = u.id JOIN Cliente c ON v.Comprador = c.Cedula WHERE v.fecha=\"{sale_date}\" AND (v.cantidad*p.precio)={sale_price} AND p.nombre=\"{sale_product}\" AND u.usuario=\"{sale_vendor}\"") # Cargar ventas por fecha, $ total, nombre de producto y username del vendedor
-        elif (sale_date) and (sale_price != 0) and (sale_product != ""): #1110
-            data = connect.query(f"SELECT v.NroVenta, v.fecha, p.nombre, u.usuario AS vendedor, c.Nombre AS cliente, v.cantidad, CONCAT('$',(v.cantidad*p.precio)) AS total FROM Venta v JOIN productos p ON v.IDProducto = p.id JOIN usuarios u ON v.IDEmpleado = u.id JOIN Cliente c ON v.Comprador = c.Cedula WHERE v.fecha=\"{sale_date}\" AND (v.cantidad*p.precio)={sale_price} AND p.nombre=\"{sale_product}\"") # Cargar ventas por fecha, $ total y nombre de producto
-        elif (sale_date) and(sale_price != 0) and (sale_vendor != ""): #1101
-            data = connect.query(f"SELECT v.NroVenta, v.fecha, p.nombre, u.usuario AS vendedor, c.Nombre AS cliente, v.cantidad, CONCAT('$',(v.cantidad*p.precio)) AS total FROM Venta v JOIN productos p ON v.IDProducto = p.id JOIN usuarios u ON v.IDEmpleado = u.id JOIN Cliente c ON v.Comprador = c.Cedula WHERE v.fecha=\"{sale_date}\" AND (v.cantidad*p.precio)={sale_price} AND u.usuario=\"{sale_vendor}\"") # Cargar ventas por fecha, $ total y username del vendedor
-        elif (sale_date) and (sale_product != "") and (sale_vendor != ""): #1011
-            data = connect.query(f"SELECT v.NroVenta, v.fecha, p.nombre, u.usuario AS vendedor, c.Nombre AS cliente, v.cantidad, CONCAT('$',(v.cantidad*p.precio)) AS total FROM Venta v JOIN productos p ON v.IDProducto = p.id JOIN usuarios u ON v.IDEmpleado = u.id JOIN Cliente c ON v.Comprador = c.Cedula WHERE v.fecha=\"{sale_date}\" AND p.nombre=\"{sale_product}\" AND u.usuario=\"{sale_vendor}\"") # Cargar ventas por fecha, nombre de producto y username del vendedor
-        elif (sale_price != 0) and (sale_product != "") and (sale_vendor != ""): #0111
-            data = connect.query(f"SELECT v.NroVenta, v.fecha, p.nombre, u.usuario AS vendedor, c.Nombre AS cliente, v.cantidad, CONCAT('$',(v.cantidad*p.precio)) AS total FROM Venta v JOIN productos p ON v.IDProducto = p.id JOIN usuarios u ON v.IDEmpleado = u.id JOIN Cliente c ON v.Comprador = c.Cedula WHERE (v.cantidad*p.precio)={sale_price} AND p.nombre=\"{sale_product}\" AND u.usuario=\"{sale_vendor}\"") # Cargar ventas por $ total, nombre de producto y username del vendedor
-        elif (sale_date) and (sale_product != ""): #1010
-            data = connect.query(f"SELECT v.NroVenta, v.fecha, p.nombre, u.usuario AS vendedor, c.Nombre AS cliente, v.cantidad, CONCAT('$',(v.cantidad*p.precio)) AS total FROM Venta v JOIN productos p ON v.IDProducto = p.id JOIN usuarios u ON v.IDEmpleado = u.id JOIN Cliente c ON v.Comprador = c.Cedula WHERE v.fecha=\"{sale_date}\" AND p.nombre=\"{sale_product}\"") # Cargar ventas por fecha y nombre de producto
-        elif (sale_date) and (sale_vendor != ""): #1001
-            data = connect.query(f"SELECT v.NroVenta, v.fecha, p.nombre, u.usuario AS vendedor, c.Nombre AS cliente, v.cantidad, CONCAT('$',(v.cantidad*p.precio)) AS total FROM Venta v JOIN productos p ON v.IDProducto = p.id JOIN usuarios u ON v.IDEmpleado = u.id JOIN Cliente c ON v.Comprador = c.Cedula WHERE v.fecha=\"{sale_date}\" AND u.usuario=\"{sale_vendor}\"") # Cargar ventas por fecha y username de vendedor
-        elif (sale_date) and (sale_price != 0.0): #1100
-            data = connect.query(f"SELECT v.NroVenta, v.fecha, p.nombre, u.usuario AS vendedor, c.Nombre AS cliente, v.cantidad, CONCAT('$',(v.cantidad*p.precio)) AS total FROM Venta v JOIN productos p ON v.IDProducto = p.id JOIN usuarios u ON v.IDEmpleado = u.id JOIN Cliente c ON v.Comprador = c.Cedula WHERE v.fecha=\"{sale_date}\" AND (v.cantidad*p.precio)={sale_price}") # Cargar ventas por fecha y $ total
-        elif (sale_price != 0) and (sale_product != ""): #0110
-            data = connect.query(f"SELECT v.NroVenta, v.fecha, p.nombre, u.usuario AS vendedor, c.Nombre AS cliente, v.cantidad, CONCAT('$',(v.cantidad*p.precio)) AS total FROM Venta v JOIN productos p ON v.IDProducto = p.id JOIN usuarios u ON v.IDEmpleado = u.id JOIN Cliente c ON v.Comprador = c.Cedula WHERE (v.cantidad*p.precio)={sale_price} AND p.nombre=\"{sale_product}\"") # Cargar ventas por $ total y nombre de producto
-        elif (sale_price != 0) and (sale_vendor != ""): #0101
-            data = connect.query(f"SELECT v.NroVenta, v.fecha, p.nombre, u.usuario AS vendedor, c.Nombre AS cliente, v.cantidad, CONCAT('$',(v.cantidad*p.precio)) AS total FROM Venta v JOIN productos p ON v.IDProducto = p.id JOIN usuarios u ON v.IDEmpleado = u.id JOIN Cliente c ON v.Comprador = c.Cedula WHERE (v.cantidad*p.precio)={sale_price} AND u.usuario=\"{sale_vendor}\"") # Cargar ventas por $ total y username de vendedor
-        elif (sale_product != "") and (sale_vendor != ""): #0011
-            data = connect.query(f"SELECT v.NroVenta, v.fecha, p.nombre, u.usuario AS vendedor, c.Nombre AS cliente, v.cantidad, CONCAT('$',(v.cantidad*p.precio)) AS total FROM Venta v JOIN productos p ON v.IDProducto = p.id JOIN usuarios u ON v.IDEmpleado = u.id JOIN Cliente c ON v.Comprador = c.Cedula WHERE p.nombre=\"{sale_product}\" AND u.usuario=\"{sale_vendor}\"") # Cargar ventas por nombre de producto y username de vendedor
-        elif (sale_price != 0.0): #0100
-            data = connect.query(f"SELECT v.NroVenta, v.fecha, p.nombre, u.usuario AS vendedor, c.Nombre AS cliente, v.cantidad, CONCAT('$',(v.cantidad*p.precio)) AS total FROM Venta v JOIN productos p ON v.IDProducto = p.id JOIN usuarios u ON v.IDEmpleado = u.id JOIN Cliente c ON v.Comprador = c.Cedula WHERE (v.cantidad*p.precio)={sale_price}") # Cargar ventas por $ total
-        elif (sale_product != ""): #0010
-            data = connect.query(f"SELECT v.NroVenta, v.fecha, p.nombre, u.usuario AS vendedor, c.Nombre AS cliente, v.cantidad, CONCAT('$',(v.cantidad*p.precio)) AS total FROM Venta v JOIN productos p ON v.IDProducto = p.id JOIN usuarios u ON v.IDEmpleado = u.id JOIN Cliente c ON v.Comprador = c.Cedula WHERE p.nombre=\"{sale_product}\"") # Cargar ventas por nombre de producto
-        elif (sale_vendor != ""): #0001
-            data = connect.query(f"SELECT v.NroVenta, v.fecha, p.nombre, u.usuario AS vendedor, c.Nombre AS cliente, v.cantidad, CONCAT('$',(v.cantidad*p.precio)) AS total FROM Venta v JOIN productos p ON v.IDProducto = p.id JOIN usuarios u ON v.IDEmpleado = u.id JOIN Cliente c ON v.Comprador = c.Cedula WHERE u.usuario=\"{sale_vendor}\"") # Cargar ventas por username de vendedor
-        elif (sale_date): #1000
-            data = connect.query(f"SELECT v.NroVenta, v.fecha, p.nombre, u.usuario AS vendedor, c.Nombre AS cliente, v.cantidad, CONCAT('$',(v.cantidad*p.precio)) AS total FROM Venta v JOIN productos p ON v.IDProducto = p.id JOIN usuarios u ON v.IDEmpleado = u.id JOIN Cliente c ON v.Comprador = c.Cedula WHERE v.fecha=\"{sale_date}\"") # Cargar ventas por fecha
-        else: #0000
-            data = connect.query(f"SELECT v.NroVenta, v.fecha, p.nombre, u.usuario AS vendedor, c.Nombre AS cliente, v.cantidad, CONCAT('$',(v.cantidad*p.precio)) AS total FROM Venta v JOIN productos p ON v.IDProducto = p.id JOIN usuarios u ON v.IDEmpleado = u.id JOIN Cliente c ON v.Comprador = c.Cedula") # Cargar todas las ventas
+        # En caso tal de que haya alguno de los filtros.
+        if (sale_date) or (sale_price != 0.0) or (sale_product != "") or (sale_vendor != ""):
+            conditions = [] # Lista a la que se irá agregando las condiciones dadas para filtrar.
+            if sale_date:
+                conditions.append(f"v.fecha=\"{sale_date}\"")
+            if sale_price != 0.0:
+                conditions.append(f"(v.cantidad*p.precio)={sale_price}")
+            if sale_product != "":
+                conditions.append(f"p.nombre LIKE \"%{sale_product}%\"")
+            if sale_vendor != "":
+                conditions.append(f"u.usuario LIKE \"%{sale_vendor}%\"")
+            query += " WHERE " + (" AND ".join(conditions)) # Se agregan las condiciones al query siguiendo las normas de queries en SQL.
+        data = connect.query(query)
         wins = data["total"].str.replace('$', "", regex=False) # Extraer el total de cada fila.
         new_row = {'NroVenta':'total:', 'total':f'${wins.astype(float).sum()}'} # Nueva columna para calcular el total ganado.
         df_new_row = pd.DataFrame([new_row]) # La columna se convierte a dataframe para poder concatenarla.
