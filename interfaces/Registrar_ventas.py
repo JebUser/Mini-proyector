@@ -1,7 +1,40 @@
 import streamlit as st
+import pandas as pd
 from connection import connect
 
 tab1, tab2, tab3,tab4 = st.tabs(["Till", "Sales", "Reports","Settings"])
+
+column_configuration = {
+    "id": st.column_config.TextColumn("ID", help="ID del producto", max_chars=100),
+    "nombre": st.column_config.TextColumn("Nombre", help="Descripcion del Producto", max_chars=300),
+    "precio": st.column_config.NumberColumn("Precio (COP)", help="Precio del Producto", min_value=0),
+    "cantidad": st.column_config.NumberColumn("Cantidad", help="Cantidad del Producto", min_value=0),
+    "descripcion": st.column_config.TextColumn("Descripcion", help="Descripcion del Producto", max_chars=300),
+}
+
+if "selected_products" not in st.session_state:
+    st.session_state.selected_products = {}
+
+if "searched_products" not in st.session_state:
+    st.session_state.searched_products = None
+
+
+
+def update_selected_products(event, df):
+
+    products = event.selection.rows
+    filtered = df.iloc[products]
+
+    for index, row in filtered.iterrows():
+        ide = row['id']
+        nombre = row['nombre']
+        if ide not in st.session_state.selected_products:
+            st.session_state.selected_products[ide] = nombre
+
+    dic = st.session_state.selected_products
+    
+    dic
+
 
 with tab1:
     with st.container():
@@ -26,16 +59,27 @@ with tab1:
 
     with st.container():
         refresh = st.button("Refresh")
+
+        df = st.session_state.searched_products
+
         if refresh or submitid or submitname: # Si el usuario refresca la info o inicia una búsqueda con filtro.
             if submitid and prompt_id != "":
-                data = connect.query(f"SELECT * FROM productos WHERE id={prompt_id}")
-                st.dataframe(data)
+                df = connect.query(f"SELECT * FROM productos WHERE id={prompt_id}")
             elif submitname and prompt_name != "":
-                data = connect.query(f"SELECT * FROM productos WHERE nombre LIKE '%{prompt_name}%'")
-                st.dataframe(data)
+                df = connect.query(f"SELECT * FROM productos WHERE nombre LIKE '%{prompt_name}%'")
             else:
-                data = connect.query("SELECT * FROM productos") # Cargar todos los productos.
-                st.dataframe(data)
+                df = connect.query("SELECT * FROM productos") # Cargar todos los productos.
+
+            st.session_state.searched_products =  df
+
+
+        event = st.dataframe(pd.DataFrame(df),use_container_width=True,hide_index=True,on_select="rerun",selection_mode="multi-row")
+    
+
+        st.header("Productos Seleccionados")
+        update_selected_products(event,df)
+
+        
 
 with tab2:
     st.header("Sales")
