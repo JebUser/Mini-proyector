@@ -34,7 +34,7 @@ with st.container():
     search_button = st.button("Search")
     data = None
     query = "SELECT v.NroVenta, v.fecha, p.nombre, u.usuario AS vendedor, c.Nombre AS cliente, v.cantidad, CONCAT('$',(v.cantidad*p.precio)) AS total FROM Venta v JOIN productos p ON v.IDProducto = p.id JOIN usuarios u ON v.IDEmpleado = u.id JOIN Cliente c ON v.Comprador = c.Cedula" # Query por defecto.
-    
+    data = connect.query(query)
     if search_button:
         # En caso tal de que haya alguno de los filtros.
         if (sale_date) or (sale_price != 0.0) or (sale_product != "") or (sale_vendor != ""):
@@ -49,8 +49,9 @@ with st.container():
                 conditions.append(f"u.usuario LIKE \"%{sale_vendor}%\"")
             query += " WHERE " + (" AND ".join(conditions)) # Se agregan las condiciones al query siguiendo las normas de queries en SQL.
         data = connect.query(query)
-        wins = data["total"].str.replace('$', "", regex=False) # Extraer el total de cada fila.
-        new_row = {'NroVenta':'total:', 'total':f'${wins.astype(float).sum()}'} # Nueva columna para calcular el total ganado.
-        df_new_row = pd.DataFrame([new_row]) # La columna se convierte a dataframe para poder concatenarla.
-        data = pd.concat([data, df_new_row], ignore_index=True)
-        st.dataframe(data)
+    wins = data["total"].str.replace('$', "", regex=False) # Extraer el total de cada fila.
+    new_row = {'NroVenta':'total:', 'total':f'${wins.astype(float).sum()}'} # Nueva columna para calcular el total ganado.
+    df_new_row = pd.DataFrame([new_row]) # La columna se convierte a dataframe para poder concatenarla.
+    data = pd.concat([data, df_new_row], ignore_index=True)
+    st.dataframe(data)
+    st.cache_data.clear()
