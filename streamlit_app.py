@@ -1,25 +1,52 @@
 import streamlit as st
+from connection import connect
+import pandas as pd
 
-#Asignación de rol
+# Definición de usuarios y contraseñas (esto debería estar encriptado y almacenado en una base de datos en un entorno real)
+# Verificar credenciales en la base de datos
+# Cargar todos los usuarios y roles desde la base de datos
+# Verificar credenciales en la base de datos
+def check_credentials(username, password):
+    query = f" SELECT u.usuario, u.contrasena, r.nombre as rol FROM usuarios u JOIN rol r ON u.rol_id = r.id WHERE u.usuario =\"{username}\" "
+    result = connect.query(query)
+        # Mostramos el DataFrame en Streamlit (opcional)
+    st.dataframe(result)
+    
+    # Nos aseguramos de que hay un resultado
+    if not result.empty:
+        # Comparamos la contraseña
+        if result["contrasena"].iloc[0] == password:
+            return result["rol"].iloc[0]
+    
+    return None
+
+# Asignación de rol y autenticación
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
 if "role" not in st.session_state:
     st.session_state.role = None
 
-ROLES = [None, "Admin", "Empleado"]
-
-#TODO Hacer sesion con seguridad
-#Inicio de sesión del aplicativo
 def login():
-
-    st.header("Bienvenido")
-    role = st.selectbox("Selecciona tu rol", ROLES)
-
+    st.header("Iniciar Sesión")
+    username = st.text_input("Usuario")
+    password = st.text_input("Contraseña", type="password")
+    
     if st.button("Iniciar sesión"):
-        st.session_state.role = role
-        st.rerun()
+        role = check_credentials(username, password)
+        if role:
+            st.session_state.authenticated = True
+            st.session_state.role = role
+            st.success(f"Bienvenido {username}!")
+            st.cache_data.clear()
+            st.rerun()
+        else:
+            st.error("Usuario o contraseña incorrectos")
 
 #Salir de sesion
 def logout():
+    st.session_state.authenticated = False
     st.session_state.role = None
+    st.cache_data.clear()
     st.rerun()
 
 role = st.session_state.role
@@ -54,10 +81,10 @@ st.title("POS Javeriana")
 
 #Genera un diccionario general en que se asignan las paginas a cada rol
 page_dict = {}
-if st.session_state.role in ["Empleado", "Admin"]:
-    page_dict["Empleado"] = empleado_pages
-if st.session_state.role == "Admin":
-    page_dict["Admin"] = admin_pages
+if st.session_state.role in ["Vendedor", "Administrador"]:
+    page_dict["Vendedor"] = empleado_pages
+if st.session_state.role == "Administrador":
+    page_dict["Administrador"] = admin_pages
 
 #Despliega las paginas por rol
 if len(page_dict) > 0:
