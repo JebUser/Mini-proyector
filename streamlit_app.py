@@ -17,14 +17,8 @@ def check_credentials(username, password):
         # Comparamos la contraseña
         if result["contrasena"].iloc[0] == password:
             return result["rol"].iloc[0]
-    
     return None
 
-# Asignación de rol y autenticación
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
-if "role" not in st.session_state:
-    st.session_state.role = None
 
 def login():
     st.header("Iniciar Sesión")
@@ -48,6 +42,14 @@ def logout():
     st.session_state.role = None
     st.cache_data.clear()
     st.rerun()
+
+
+# Asignación de rol y autenticación
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+if "role" not in st.session_state:
+    st.session_state.role = None
+
 
 role = st.session_state.role
 #Paginas predeterminadas
@@ -93,3 +95,4 @@ else:
     pg = st.navigation([st.Page(login)])
 
 pg.run()
+
