@@ -1,11 +1,6 @@
 import streamlit as st
 from connection import connect
-from sqlalchemy import create_engine, text
-
-# Define the database connection URL
-db_url = "mysql+pymysql://connectDB:quieropasarpyd@172.22.81.3/MINIPROJECT"
-# Create an engine instance
-engine = create_engine(db_url)
+from sqlalchemy import text
 
 # Inicialización de estados en Streamlit
 if "selected_products" not in st.session_state:
@@ -39,15 +34,6 @@ def execute_query(query):
     connect.query(query)
     connect.commit() 
 
-# Function to execute non-fetch queries (like INSERT)
-def execute_non_fetch_query(query):
-    try:
-        with engine.connect() as connection:
-            connection.execute(text(query))
-            connection.commit()
-    except Exception as e:
-        st.error(f"Error executing query: {e}")
-
 #verificamos si el usuario unde el boton para buscar algun producto
 def search_check(refresh, submitid, submitname):
     if refresh or submitid or submitname:
@@ -65,20 +51,27 @@ def search_check(refresh, submitid, submitname):
         selected_rows = st.multiselect("Selecciona productos", df.index, format_func=lambda x: f"{df.loc[x, 'nombre']} - {df.loc[x, 'id']}")
         update_selected_products(selected_rows, df)
 
+# Hacer una inserción y obtener el id resultante de esa inserción de ser requerido.
+def insert_data(query, get_id=False):
+    if get_id:
+        data = connect.session.execute(text(query)).lastrowid
+        return data
+    else:
+        connect.session.execute(text(query))
+        return None
+
 #confirmar una venta
 def check_out(cliente_cc):
     if st.button("Confirmar Venta"):
         try:
 
-            # Obtener el número de la venta recién insertada
-            nro_venta = connect.query("SELECT LAST_INSERT_ID()").iloc[0][0]
-
             # Insertar en la tabla venta
             query = f"""
-                INSERT INTO venta (NroVenta, ID_Cliente, ID_Empleado,Fecha)
-                VALUES ({nro_venta},{cliente_cc}, {1}, CURRENT_DATE)
+                INSERT INTO venta (ID_Cliente, ID_Empleado,Fecha)
+                VALUES ({cliente_cc}, {1}, CURRENT_DATE)
             """
-            execute_non_fetch_query(query)
+            # Obtener el número de la venta que se desea agregar.
+            nro_venta = insert_data(query, get_id=True)
 
             # Registrar los productos de la venta en prod_venta y actualizar inventario
             for prod_id, details in st.session_state.selected_products.items():
@@ -89,7 +82,7 @@ def check_out(cliente_cc):
                     INSERT INTO prod_venta (NroVenta, ID_Producto, Cantidad)
                     VALUES ({nro_venta}, {prod_id}, {qty})
                 """
-                execute_non_fetch_query(query)
+                insert_data(query)
 
                 # Actualizar la cantidad de productos en la tabla productos
                 query = f"""
@@ -97,7 +90,7 @@ def check_out(cliente_cc):
                     SET cantidad = cantidad - {qty}
                     WHERE id = {prod_id}
                 """
-                execute_non_fetch_query(query)
+                insert_data(query)
             
             st.success("Venta confirmada")
             st.session_state.selected_products.clear()  # Limpiar productos seleccionados después de confirmar la venta
@@ -114,7 +107,7 @@ def registrar_cliente(cliente_cc):
 
         if registrar_cliente and nuevo_nombre and nuevo_correo and cliente_cc is not None:
             query = f"INSERT INTO Cliente (Cedula, Nombre, Correo) VALUES ({cliente_cc}, '{nuevo_nombre}', '{nuevo_correo}')"
-            execute_non_fetch_query(query)
+            insert_data(query)
             st.success("Cliente registrado exitosamente")
         elif registrar_cliente:
             st.warning("Por favor, completa los campos de nombre y correo.")
