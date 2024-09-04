@@ -202,3 +202,5 @@ with st.container():
         #si hay algun cliente asociado lo retorna    
         cliente_cc = buscar_cliente()
         check_out(cliente_cc)
+
+st.cache_data.clear()
