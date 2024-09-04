@@ -28,7 +28,6 @@ def update_selected_products(selected_rows, df):
         if product_id not in st.session_state.selected_products:
             add_product_to_selection(product_id, product_name)
 
-
 #ejecutar un query
 def execute_query(query):
     connect.query(query)
