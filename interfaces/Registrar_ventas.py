@@ -161,6 +161,7 @@ def display_selected_products():
             if col4.button('X', key=f"delete_{product_id}"):
                 # Eliminar el producto y refrescar la página.
                 del st.session_state.selected_products[product_id]
+                st.rerun()
     else:
         st.write("No hay productos seleccionados.")
 
