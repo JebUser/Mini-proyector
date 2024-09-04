@@ -148,13 +148,19 @@ def display_selected_products():
     st.subheader("Productos Seleccionados")
     if st.session_state.selected_products:
         for product_id, details in st.session_state.selected_products.items():
-            col1, col2, col3 = st.columns([2, 2, 2])
+            col1, col2, col3, col4 = st.columns([2, 2, 2, 1])
             col1.write(details["name"])
             quantity = col2.number_input(f"Cantidad ({details['name']})", min_value=1, value=details["quantity"], key=f"qty_{product_id}")
             details["quantity"] = quantity
             precio = connect.query(f"SELECT precio FROM productos WHERE id={product_id}").iloc[0]['precio']
             subtotal = precio * quantity
             col3.write(f"Subtotal: {subtotal} COP")
+
+            # TODO: Hasta ahora se puede borrar, pero para que funcione, se debe borrar también del multiselect. Por favor corregir eso.
+            # Posibilidad de eliminar un elemento de la selección.
+            if col4.button('X', key=f"delete_{product_id}"):
+                # Eliminar el producto y refrescar la página.
+                del st.session_state.selected_products[product_id]
     else:
         st.write("No hay productos seleccionados.")
 
