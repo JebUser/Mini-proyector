@@ -1,6 +1,11 @@
 import streamlit as st
-import pandas as pd
 from connection import connect
+from sqlalchemy import create_engine, text
+
+# Define the database connection URL
+db_url = "mysql+pymysql://connectDB:quieropasarpyd@172.22.81.3/MINIPROJECT"
+# Create an engine instance
+engine = create_engine(db_url)
 
 # Inicialización de estados en Streamlit
 if "selected_products" not in st.session_state:
@@ -8,6 +13,9 @@ if "selected_products" not in st.session_state:
 
 if "searched_products" not in st.session_state:
     st.session_state.searched_products = None
+
+if "new_client" not in st.session_state:
+    st.session_state.new_client = False
 
 #Agregar un producto seleccionado
 def add_product_to_selection(product_id, product_name, quantity=1):
@@ -25,14 +33,23 @@ def update_selected_products(selected_rows, df):
         if product_id not in st.session_state.selected_products:
             add_product_to_selection(product_id, product_name)
 
+
 #ejecutar un query
 def execute_query(query):
     connect.query(query)
     connect.commit() 
 
-#verificamos si el usuario unde el boton para buscar algun producto
-def search_check(refresh,submitid,submitname):
+# Function to execute non-fetch queries (like INSERT)
+def execute_non_fetch_query(query):
+    try:
+        with engine.connect() as connection:
+            connection.execute(text(query))
+            connection.commit()
+    except Exception as e:
+        st.error(f"Error executing query: {e}")
 
+#verificamos si el usuario unde el boton para buscar algun producto
+def search_check(refresh, submitid, submitname):
     if refresh or submitid or submitname:
         if submitid and prompt_id != "":
             df = connect.query(f"SELECT * FROM productos WHERE id={prompt_id}")
@@ -50,69 +67,88 @@ def search_check(refresh,submitid,submitname):
 
 #confirmar una venta
 def check_out(cliente_cc):
-
     if st.button("Confirmar Venta"):
         try:
-            # Registrar la venta y actualizar inventario
+
+            # Obtener el número de la venta recién insertada
+            nro_venta = connect.query("SELECT LAST_INSERT_ID()").iloc[0][0]
+
+            # Insertar en la tabla venta
+            query = f"""
+                INSERT INTO venta (NroVenta, ID_Cliente, ID_Empleado,Fecha)
+                VALUES ({nro_venta},{cliente_cc}, {1}, CURRENT_DATE)
+            """
+            execute_non_fetch_query(query)
+
+            # Registrar los productos de la venta en prod_venta y actualizar inventario
             for prod_id, details in st.session_state.selected_products.items():
                 qty = details["quantity"]
 
-                if cliente_cc != None:
-                    # Registrar la venta
-                    execute_query(f"""
-                        INSERT INTO Venta (Fecha, IDProducto, IDEmpleado, cantidad, Comprador)
-                        VALUES (CURRENT_DATE, {prod_id}, {1}, {qty}, {cliente_cc})
-                    """)
+                # Insertar en prod_venta
+                query = f"""
+                    INSERT INTO prod_venta (NroVenta, ID_Producto, Cantidad)
+                    VALUES ({nro_venta}, {prod_id}, {qty})
+                """
+                execute_non_fetch_query(query)
 
                 # Actualizar la cantidad de productos en la tabla productos
-                execute_query(f"""
+                query = f"""
                     UPDATE productos
                     SET cantidad = cantidad - {qty}
                     WHERE id = {prod_id}
-                """)
+                """
+                execute_non_fetch_query(query)
             
             st.success("Venta confirmada")
             st.session_state.selected_products.clear()  # Limpiar productos seleccionados después de confirmar la venta
         except Exception as e:
             st.error(f"Error al registrar la venta: {e}")
 
-#registrar cliente
-def clientes():
+#registrar un cliente
+def registrar_cliente(cliente_cc):
+    with st.form("cliente-register-form"):
+        nuevo_nombre = st.text_input("Nombre del Cliente")
+        nuevo_correo = st.text_input("Correo del Cliente")        
+        # Aquí manejamos la lógica de registrar un nuevo cliente dentro del mismo formulario
+        registrar_cliente = st.form_submit_button("Registrar Cliente")
+
+        if registrar_cliente and nuevo_nombre and nuevo_correo and cliente_cc is not None:
+            query = f"INSERT INTO Cliente (Cedula, Nombre, Correo) VALUES ({cliente_cc}, '{nuevo_nombre}', '{nuevo_correo}')"
+            execute_non_fetch_query(query)
+            st.success("Cliente registrado exitosamente")
+        elif registrar_cliente:
+            st.warning("Por favor, completa los campos de nombre y correo.")
+
+#buscar cliente
+def buscar_cliente():
     # Selección de Cliente
     st.subheader("Cliente")
     cliente_cc = None
+    
     with st.form("cliente-form"):
         col1, col2 = st.columns([9,11])
         with col1:
             cliente_cc = st.text_input("Cédula del Cliente", placeholder="Ingrese la cédula del cliente")
         with col2:
             buscar_cliente = st.form_submit_button("Buscar")
-
         if buscar_cliente and cliente_cc:
-            try:
-                # Convertir cliente_cc a entero para la consulta
-                cliente_cc = int(cliente_cc)
-                cliente_data = connect.query(f"SELECT * FROM Cliente WHERE Cedula={cliente_cc}")
-                
-                if not cliente_data.empty:
-                    st.write(f"Cliente: {cliente_data.iloc[0]['Nombre']}, Correo: {cliente_data.iloc[0]['Correo']}")
-                else:
-                    st.warning("Cliente no encontrado. Puedes registrar un nuevo cliente.")
-                    nuevo_nombre = st.text_input("Nombre del Cliente")
-                    nuevo_correo = st.text_input("Correo del Cliente")
-                    
-                    # Aquí manejamos la lógica de registrar un nuevo cliente dentro del mismo formulario
-                    registrar_cliente = st.form_submit_button("Registrar Cliente")
+            # Convertir cliente_cc a entero para la consulta
+            cliente_cc = int(cliente_cc)
+            cliente_data = connect.query(f"SELECT * FROM Cliente WHERE Cedula={cliente_cc}")
+            if not cliente_data.empty:
+                st.write(f"Cliente: {cliente_data.iloc[0]['Nombre']}, Correo: {cliente_data.iloc[0]['Correo']}")
+                st.session_state.new_client = False
+            else:
+                st.warning("Cliente no encontrado. Puedes registrar un nuevo cliente abajo.")
+                st.session_state.new_client = True
 
-                    if registrar_cliente and nuevo_nombre and nuevo_correo:
-                        connect.query(f"INSERT INTO Cliente (Cedula, Nombre, Correo) VALUES ({cliente_cc}, '{nuevo_nombre}', '{nuevo_correo}')")
-                        st.success("Cliente registrado exitosamente")
-                    elif registrar_cliente:
-                        st.warning("Por favor, completa los campos de nombre y correo.")
-            
-            except ValueError:
-                st.error("La cédula debe ser un número entero válido.")
+    if st.session_state.new_client == True:
+        registrar_cliente(cliente_cc)
+        
     return cliente_cc
+
+
+
 
 #mostrar los productos que hayan sido seleccionados
 def display_selected_products():
@@ -130,12 +166,11 @@ def display_selected_products():
         st.write("No hay productos seleccionados.")
 
 with st.container():
-    col1_add, col2_search,col3_summary = st.columns([10, 10, 8])
+    col1_add, col2_search, col3_summary = st.columns([10, 10, 8])
     refresh = False
     submitname = ""
     submitid = ""
     
-   
     with col1_add:
         with st.form("stock-add-form"):
             col2, col3 = st.columns([5, 5])
@@ -144,7 +179,7 @@ with st.container():
             with col3:
                 submitid = st.form_submit_button("Buscar")
         refresh = st.button("Refrescar")
-        search_check(refresh,submitid,submitname)
+        search_check(refresh, submitid, submitname)
         display_selected_products() 
     with col2_search:
         with st.form("stock-search-form"):
@@ -153,12 +188,12 @@ with st.container():
                 prompt_name = st.text_input("Buscar por Nombre", value="", placeholder="Ingrese nombre del producto", label_visibility="collapsed")
             with col3:
                 submitname = st.form_submit_button("Buscar")
-
           
     with col3_summary:
         # Resumen de Venta y Confirmación
         st.subheader("Resumen de la Venta")
         total = 0
+        cliente_cc = None
         if st.session_state.selected_products:
             for prod_id, details in st.session_state.selected_products.items():
                 prod_name = details["name"]
@@ -168,9 +203,9 @@ with st.container():
                 st.write(f"{prod_name}: {qty} x {precio} = {subtotal} COP")
                 total += subtotal
 
-            st.metric(label="Total", value=total, delta=None, delta_color="normal",label_visibility="visible")
-        #si hay algun cliente asociado lo retorna    
-        cliente_cc = clientes()
-        check_out(cliente_cc)
+            st.metric(label="Total", value=total, delta=None, delta_color="normal", label_visibility="visible")
+        
 
-       
+        #si hay algun cliente asociado lo retorna    
+        cliente_cc = buscar_cliente()
+        check_out(cliente_cc)
