@@ -1,6 +1,5 @@
 import streamlit as st
 from connection import connect
-import pandas as pd
 
 # Definición de usuarios y contraseñas (esto debería estar encriptado y almacenado en una base de datos en un entorno real)
 # Verificar credenciales en la base de datos
@@ -18,7 +17,6 @@ def check_credentials(username, password):
         if result["contrasena"].iloc[0] == password:
             return result["rol"].iloc[0]
     return None
-
 
 def login():
     st.header("Iniciar Sesión")
@@ -42,7 +40,6 @@ def logout():
     st.session_state.role = None
     st.cache_data.clear()
     st.rerun()
-
 
 # Asignación de rol y autenticación
 if "authenticated" not in st.session_state:
@@ -73,10 +70,15 @@ registrar_ventas = st.Page(
     title="Registro de ventas", 
     icon=":material/bug_report:",
 )
+reportes = st.Page(
+    "interfaces/Reportes.py", 
+    title="Reportes", 
+    icon="📊",
+)
 
 #Paginas para cada rol
 account_pages = [logout_page, settings]
-empleado_pages = [Menu, historial, registrar_ventas]
+empleado_pages = [Menu, historial, registrar_ventas,reportes]
 admin_pages = []
 
 st.title("POS Javeriana")
