@@ -28,11 +28,6 @@ def update_selected_products(selected_rows, df):
         if product_id not in st.session_state.selected_products:
             add_product_to_selection(product_id, product_name)
 
-#ejecutar un query
-def execute_query(query):
-    connect.query(query)
-    connect.commit() 
-
 #verificamos si el usuario unde el boton para buscar algun producto
 def search_check(refresh, submitid, submitname):
     if refresh or submitid or submitname:
@@ -65,7 +60,6 @@ def insert_data(query, get_id=False):
 def check_out(cliente_cc):
     if st.button("Confirmar Venta"):
         try:
-
             # Insertar en la tabla venta
             query = f"""
                 INSERT INTO venta (ID_Cliente, ID_Empleado,Fecha)
@@ -140,8 +134,6 @@ def buscar_cliente():
         registrar_cliente(cliente_cc)
         
     return cliente_cc
-
-
 
 
 #mostrar los productos que hayan sido seleccionados
