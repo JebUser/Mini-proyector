@@ -8,11 +8,11 @@ def mostrar_inicio():
 
         * Alejandro Sarmiento
        
-        * Maria José Pava Echeverri
+        * Maria José Pava Echeverry
       
         * José Daniel Ramirez
 
-        * Matero Ramirez
+        * Mateo Ramirez
 
         """
 
