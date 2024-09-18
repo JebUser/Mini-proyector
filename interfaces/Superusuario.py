@@ -21,14 +21,18 @@ WHERE table_schema=\"{get_db_name.iat[0,0]}\";
 
 tables = connect.query(table_list_query) 
 
+if "table_data" not in st.session_state:
+    st.session_state.table_data = None
+
 with st.container():
     col_select, col_refresh = st.columns([8, 2])
     with col_select:
         selected_table = st.selectbox('Choose a table to modify:', tables)
     with col_refresh:
         refresh_button = st.button("Refresh")
+        # Puede que se tome un poco en ver los cambios
         if refresh_button:
-            del st.session_state.selected_table
+            del st.session_state.table_data
     col1_selectasterisk, col2_editor = st.columns([10, 10])
     with col1_selectasterisk:
         select_all_in_table = f"""
@@ -37,8 +41,6 @@ with st.container():
         data = connect.query(select_all_in_table)
         if not data.empty:
             st.write("Table Data:")
-            # TODO: Utilizar session states para reflejar los cambios hechos a la DB en vivo
-            # Por ahora toca irse a otra pestaña (Historial de ventas) y volver a esta para que se vean los cambios
             st.dataframe(data)
         else:
             st.write("The selected table has no data entries.")
@@ -134,3 +136,5 @@ with st.container():
             elif selected_table == "venta":
                 delete_query = f"DELETE FROM venta WHERE NroVenta={v_nventa_input}"
             insert_data(delete_query)
+
+st.cache_data.clear()
