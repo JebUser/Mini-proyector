@@ -47,7 +47,7 @@ with st.container():
     with col2_editor:
         # Se viene una ola de espagueti que no se como evitar!!!!! :D
         # Inputs marcados con (*) es porque no pueden ser nulos a la hora de añadirlos a la base de datos
-        if selected_table == "cliente":
+        if selected_table == "Cliente":
             c_cedula_input = st.number_input("(*) Cedula:", min_value=0, max_value=2147483647, value=1, step=1)
             c_nombre_input = st.text_input("(*) Nombre:")
             c_correo_input = st.text_input("(*) Correo:")
