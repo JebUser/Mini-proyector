@@ -47,7 +47,7 @@ with st.container():
     with col2_editor:
         # Se viene una ola de espagueti que no se como evitar!!!!! :D
         # Inputs marcados con (*) es porque no pueden ser nulos a la hora de añadirlos a la base de datos
-        if selected_table == "Cliente":
+        if selected_table.lower() == "cliente":
             c_cedula_input = st.number_input("(*) Cedula:", min_value=0, max_value=2147483647, value=1, step=1)
             c_nombre_input = st.text_input("(*) Nombre:")
             c_correo_input = st.text_input("(*) Correo:")
@@ -84,57 +84,61 @@ with st.container():
     add_part, edit_part, delete_part = st.columns(3)
     with add_part:
         add_button = st.button("Add")
-        add_query = ""
         if add_button:
-            # Antes de que me tiren hate por el espagueti:
-            # Intenté hacer una implementación mas simplificada usando un diccionario para definir cada caso de querys en funcion al selected_table,
-            # pero streamlit es chistosito y me mandaba error que porque las variables de input de las demás tablas no estaban definidas... xdn't
-            if selected_table == "cliente":
+            # Guardas de seguridad: Este botón no hace nada si no se han llenado los campos necesarios
+            add_query = ""
+            if selected_table == "cliente" and c_cedula_input != 0 and c_nombre_input != "" and c_correo_input != "":
                 add_query = f"INSERT INTO cliente (Cedula, Nombre, Correo) VALUES ({c_cedula_input}, '{c_nombre_input}', '{c_correo_input}')"
-            elif selected_table == "prod_venta":
+            elif selected_table == "prod_venta" and pv_nventa_input != 0 and pv_idprod_input != 0 and pv_cantidad_input != 0:
                 add_query = f"INSERT INTO prod_venta (NroVenta, ID_Producto, Cantidad) VALUES ({pv_nventa_input}, {pv_idprod_input}, {pv_cantidad_input})"
-            elif selected_table == "productos":
+            elif selected_table == "productos" and p_id_input != 0:
                 add_query = f"INSERT INTO productos (id, nombre, precio, cantidad, descripcion) VALUES ({p_id_input}, '{p_nombre_input}', {p_precio_input}, {p_cantidad_input}, '{p_descripcion_input}')"
-            elif selected_table == "rol":
+            elif selected_table == "rol" and r_id_input != 0:
                 add_query = f"INSERT INTO rol (id, nombre) VALUES ({r_id_input}, '{r_nombre_input}')"
-            elif selected_table == "usuarios":
+            elif selected_table == "usuarios" and u_id_input != 0:
                 add_query = f"INSERT INTO usuarios (id, nombre1, nombre2, apellido1, apellido2, usuario, contrasena, correo, cc, rol_id) VALUES ({u_id_input}, '{u_nombre1_input}', '{u_nombre2_input}', '{u_apellido1_input}', '{u_apellido2_input}', '{u_usuario_input}', '{u_contrasena_input}', '{u_correo_input}', {u_cc_input}, {u_rol_id_input})"
-            elif selected_table == "venta":
+            elif selected_table == "venta" and v_nventa_input != 0 and v_idcliente_input != 0 and v_idempleado_input != 0 and v_fecha_input != None:
                 add_query = f"INSERT INTO venta (NroVenta, ID_Cliente, ID_Empleado, Fecha) VALUES ({v_nventa_input}, {v_idcliente_input}, {v_idempleado_input}, {v_fecha_input})"
-            insert_data(add_query)
+            
+            if add_query != "":
+                insert_data(add_query)
     with edit_part:
         edit_button = st.button("Edit")
-        edit_query = ""
         if edit_button:
-            if selected_table == "cliente":
+            edit_query = ""
+            if selected_table == "cliente" and c_cedula_input != 0:
                 edit_query = f"UPDATE cliente SET Nombre='{c_nombre_input}', Correo='{c_correo_input}' WHERE Cedula={c_cedula_input}"
-            elif selected_table == "prod_venta":
+            elif selected_table == "prod_venta" and pv_nventa_input != 0 and pv_idprod_input != 0:
                 edit_query = f"UPDATE prod_venta SET Cantidad={pv_cantidad_input} WHERE NroVenta={pv_nventa_input} AND ID_Producto={pv_idprod_input}"
-            elif selected_table == "productos":
+            elif selected_table == "productos" and p_id_input != 0:
                 edit_query = f"UPDATE productos SET nombre='{p_nombre_input}', precio={p_precio_input}, cantidad={p_cantidad_input}, descripcion='{p_descripcion_input}' WHERE id={p_id_input}"
-            elif selected_table == "rol":
+            elif selected_table == "rol" and r_id_input != 0:
                 edit_query = f"UPDATE rol SET nombre='{r_nombre_input}' WHERE id={r_id_input}"
-            elif selected_table == "usuarios":
+            elif selected_table == "usuarios" and u_id_input != 0:
                 edit_query = f"UPDATE usuarios SET nombre1='{u_nombre1_input}', nombre2='{u_nombre2_input}', apellido1='{u_apellido1_input}', apellido2='{u_apellido2_input}', usuario='{u_usuario_input}', contrasena='{u_contrasena_input}', correo='{u_correo_input}', cc={u_cc_input}, rol_id={u_rol_id_input} WHERE id={u_id_input}"
-            elif selected_table == "venta":
+            elif selected_table == "venta" and v_nventa_input != 0:
                 edit_query = f"UPDATE venta SET ID_Cliente={v_idcliente_input}, ID_Empleado={v_idempleado_input}, Fecha='{v_fecha_input}', WHERE NroVenta={v_nventa_input}"
-            insert_data(edit_query)
+            
+            if edit_query != "":
+                insert_data(edit_query)
     with delete_part:
         delete_button = st.button("Delete")
-        delete_query = ""
         if delete_button:
-            if selected_table == "cliente":
+            delete_query = ""
+            if selected_table == "cliente" and c_cedula_input != 0:
                 delete_query = f"DELETE FROM cliente WHERE Cedula={c_cedula_input}"
-            elif selected_table == "prod_venta":
+            elif selected_table == "prod_venta" and pv_nventa_input != 0 and pv_idprod_input != 0:
                 delete_query = f"DELETE FROM prod_venta WHERE NroVenta={pv_nventa_input} AND ID_Producto={pv_idprod_input}"
-            elif selected_table == "productos":
+            elif selected_table == "productos" and p_id_input != 0:
                 delete_query = f"DELETE FROM productos WHERE id={p_id_input}"
-            elif selected_table == "rol":
+            elif selected_table == "rol" and r_id_input != 0:
                 delete_query = f"DELETE FROM rol WHERE id={r_id_input}"
-            elif selected_table == "usuarios":
+            elif selected_table == "usuarios" and u_id_input != 0:
                 delete_query = f"DELETE FROM usuarios WHERE id={u_id_input}"
-            elif selected_table == "venta":
+            elif selected_table == "venta" and v_nventa_input != 0:
                 delete_query = f"DELETE FROM venta WHERE NroVenta={v_nventa_input}"
-            insert_data(delete_query)
+            
+            if delete_query != "":
+                insert_data(delete_query)
 
 st.cache_data.clear()
