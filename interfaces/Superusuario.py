@@ -87,8 +87,8 @@ with st.container():
         if add_button:
             # Guardas de seguridad: Este botón no hace nada si no se han llenado los campos necesarios
             add_query = ""
-            if selected_table == "cliente" and c_cedula_input != 0 and c_nombre_input != "" and c_correo_input != "":
-                add_query = f"INSERT INTO cliente (Cedula, Nombre, Correo) VALUES ({c_cedula_input}, '{c_nombre_input}', '{c_correo_input}')"
+            if selected_table == "Cliente" and c_cedula_input != 0 and c_nombre_input != "" and c_correo_input != "":
+                add_query = f"INSERT INTO Cliente (Cedula, Nombre, Correo) VALUES ({c_cedula_input}, '{c_nombre_input}', '{c_correo_input}')"
             elif selected_table == "prod_venta" and pv_nventa_input != 0 and pv_idprod_input != 0 and pv_cantidad_input != 0:
                 add_query = f"INSERT INTO prod_venta (NroVenta, ID_Producto, Cantidad) VALUES ({pv_nventa_input}, {pv_idprod_input}, {pv_cantidad_input})"
             elif selected_table == "productos" and p_id_input != 0:
@@ -102,12 +102,15 @@ with st.container():
             
             if add_query != "":
                 insert_data(add_query)
+            
+            st.cache_data.clear()
+            st.rerun()
     with edit_part:
         edit_button = st.button("Edit")
         if edit_button:
             edit_query = ""
-            if selected_table == "cliente" and c_cedula_input != 0:
-                edit_query = f"UPDATE cliente SET Nombre='{c_nombre_input}', Correo='{c_correo_input}' WHERE Cedula={c_cedula_input}"
+            if selected_table == "Cliente" and c_cedula_input != 0:
+                edit_query = f"UPDATE Cliente SET Nombre='{c_nombre_input}', Correo='{c_correo_input}' WHERE Cedula={c_cedula_input}"
             elif selected_table == "prod_venta" and pv_nventa_input != 0 and pv_idprod_input != 0:
                 edit_query = f"UPDATE prod_venta SET Cantidad={pv_cantidad_input} WHERE NroVenta={pv_nventa_input} AND ID_Producto={pv_idprod_input}"
             elif selected_table == "productos" and p_id_input != 0:
@@ -121,12 +124,15 @@ with st.container():
             
             if edit_query != "":
                 insert_data(edit_query)
+
+            st.cache_data.clear()
+            st.rerun()
     with delete_part:
         delete_button = st.button("Delete")
         if delete_button:
             delete_query = ""
-            if selected_table == "cliente" and c_cedula_input != 0:
-                delete_query = f"DELETE FROM cliente WHERE Cedula={c_cedula_input}"
+            if selected_table == "Cliente" and c_cedula_input != 0:
+                delete_query = f"DELETE FROM Cliente WHERE Cedula={c_cedula_input}"
             elif selected_table == "prod_venta" and pv_nventa_input != 0 and pv_idprod_input != 0:
                 delete_query = f"DELETE FROM prod_venta WHERE NroVenta={pv_nventa_input} AND ID_Producto={pv_idprod_input}"
             elif selected_table == "productos" and p_id_input != 0:
@@ -140,5 +146,8 @@ with st.container():
             
             if delete_query != "":
                 insert_data(delete_query)
+
+            st.cache_data.clear()
+            st.rerun()
 
 st.cache_data.clear()
