@@ -87,18 +87,18 @@ with st.container():
         if add_button:
             # Guardas de seguridad: Este botón no hace nada si no se han llenado los campos necesarios
             add_query = ""
-            if selected_table == "Cliente" and c_cedula_input != 0 and c_nombre_input != "" and c_correo_input != "":
-                add_query = f"INSERT INTO Cliente (Cedula, Nombre, Correo) VALUES ({c_cedula_input}, '{c_nombre_input}', '{c_correo_input}')"
+            if selected_table.lower() == "cliente" and c_cedula_input != 0 and c_nombre_input != "" and c_correo_input != "":
+                add_query = f"INSERT INTO {selected_table} (Cedula, Nombre, Correo) VALUES ({c_cedula_input}, '{c_nombre_input}', '{c_correo_input}')"
             elif selected_table == "prod_venta" and pv_nventa_input != 0 and pv_idprod_input != 0 and pv_cantidad_input != 0:
-                add_query = f"INSERT INTO prod_venta (NroVenta, ID_Producto, Cantidad) VALUES ({pv_nventa_input}, {pv_idprod_input}, {pv_cantidad_input})"
+                add_query = f"INSERT INTO {selected_table} (NroVenta, ID_Producto, Cantidad) VALUES ({pv_nventa_input}, {pv_idprod_input}, {pv_cantidad_input})"
             elif selected_table == "productos" and p_id_input != 0:
-                add_query = f"INSERT INTO productos (id, nombre, precio, cantidad, descripcion) VALUES ({p_id_input}, '{p_nombre_input}', {p_precio_input}, {p_cantidad_input}, '{p_descripcion_input}')"
+                add_query = f"INSERT INTO {selected_table} (id, nombre, precio, cantidad, descripcion) VALUES ({p_id_input}, '{p_nombre_input}', {p_precio_input}, {p_cantidad_input}, '{p_descripcion_input}')"
             elif selected_table == "rol" and r_id_input != 0:
-                add_query = f"INSERT INTO rol (id, nombre) VALUES ({r_id_input}, '{r_nombre_input}')"
+                add_query = f"INSERT INTO {selected_table} (id, nombre) VALUES ({r_id_input}, '{r_nombre_input}')"
             elif selected_table == "usuarios" and u_id_input != 0:
-                add_query = f"INSERT INTO usuarios (id, nombre1, nombre2, apellido1, apellido2, usuario, contrasena, correo, cc, rol_id) VALUES ({u_id_input}, '{u_nombre1_input}', '{u_nombre2_input}', '{u_apellido1_input}', '{u_apellido2_input}', '{u_usuario_input}', '{u_contrasena_input}', '{u_correo_input}', {u_cc_input}, {u_rol_id_input})"
+                add_query = f"INSERT INTO {selected_table} (id, nombre1, nombre2, apellido1, apellido2, usuario, contrasena, correo, cc, rol_id) VALUES ({u_id_input}, '{u_nombre1_input}', '{u_nombre2_input}', '{u_apellido1_input}', '{u_apellido2_input}', '{u_usuario_input}', '{u_contrasena_input}', '{u_correo_input}', {u_cc_input}, {u_rol_id_input})"
             elif selected_table == "venta" and v_nventa_input != 0 and v_idcliente_input != 0 and v_idempleado_input != 0 and v_fecha_input != None:
-                add_query = f"INSERT INTO venta (NroVenta, ID_Cliente, ID_Empleado, Fecha) VALUES ({v_nventa_input}, {v_idcliente_input}, {v_idempleado_input}, {v_fecha_input})"
+                add_query = f"INSERT INTO {selected_table} (NroVenta, ID_Cliente, ID_Empleado, Fecha) VALUES ({v_nventa_input}, {v_idcliente_input}, {v_idempleado_input}, {v_fecha_input})"
             
             if add_query != "":
                 insert_data(add_query)
@@ -109,18 +109,18 @@ with st.container():
         edit_button = st.button("Edit")
         if edit_button:
             edit_query = ""
-            if selected_table == "Cliente" and c_cedula_input != 0:
-                edit_query = f"UPDATE Cliente SET Nombre='{c_nombre_input}', Correo='{c_correo_input}' WHERE Cedula={c_cedula_input}"
+            if selected_table.lower() == "cliente" and c_cedula_input != 0:
+                edit_query = f"UPDATE {selected_table} SET Nombre='{c_nombre_input}', Correo='{c_correo_input}' WHERE Cedula={c_cedula_input}"
             elif selected_table == "prod_venta" and pv_nventa_input != 0 and pv_idprod_input != 0:
-                edit_query = f"UPDATE prod_venta SET Cantidad={pv_cantidad_input} WHERE NroVenta={pv_nventa_input} AND ID_Producto={pv_idprod_input}"
+                edit_query = f"UPDATE {selected_table} SET Cantidad={pv_cantidad_input} WHERE NroVenta={pv_nventa_input} AND ID_Producto={pv_idprod_input}"
             elif selected_table == "productos" and p_id_input != 0:
-                edit_query = f"UPDATE productos SET nombre='{p_nombre_input}', precio={p_precio_input}, cantidad={p_cantidad_input}, descripcion='{p_descripcion_input}' WHERE id={p_id_input}"
+                edit_query = f"UPDATE {selected_table} SET nombre='{p_nombre_input}', precio={p_precio_input}, cantidad={p_cantidad_input}, descripcion='{p_descripcion_input}' WHERE id={p_id_input}"
             elif selected_table == "rol" and r_id_input != 0:
-                edit_query = f"UPDATE rol SET nombre='{r_nombre_input}' WHERE id={r_id_input}"
+                edit_query = f"UPDATE {selected_table} SET nombre='{r_nombre_input}' WHERE id={r_id_input}"
             elif selected_table == "usuarios" and u_id_input != 0:
-                edit_query = f"UPDATE usuarios SET nombre1='{u_nombre1_input}', nombre2='{u_nombre2_input}', apellido1='{u_apellido1_input}', apellido2='{u_apellido2_input}', usuario='{u_usuario_input}', contrasena='{u_contrasena_input}', correo='{u_correo_input}', cc={u_cc_input}, rol_id={u_rol_id_input} WHERE id={u_id_input}"
+                edit_query = f"UPDATE {selected_table} SET nombre1='{u_nombre1_input}', nombre2='{u_nombre2_input}', apellido1='{u_apellido1_input}', apellido2='{u_apellido2_input}', usuario='{u_usuario_input}', contrasena='{u_contrasena_input}', correo='{u_correo_input}', cc={u_cc_input}, rol_id={u_rol_id_input} WHERE id={u_id_input}"
             elif selected_table == "venta" and v_nventa_input != 0:
-                edit_query = f"UPDATE venta SET ID_Cliente={v_idcliente_input}, ID_Empleado={v_idempleado_input}, Fecha='{v_fecha_input}', WHERE NroVenta={v_nventa_input}"
+                edit_query = f"UPDATE {selected_table} SET ID_Cliente={v_idcliente_input}, ID_Empleado={v_idempleado_input}, Fecha='{v_fecha_input}', WHERE NroVenta={v_nventa_input}"
             
             if edit_query != "":
                 insert_data(edit_query)
@@ -131,18 +131,18 @@ with st.container():
         delete_button = st.button("Delete")
         if delete_button:
             delete_query = ""
-            if selected_table == "Cliente" and c_cedula_input != 0:
-                delete_query = f"DELETE FROM Cliente WHERE Cedula={c_cedula_input}"
+            if selected_table.lower() == "cliente" and c_cedula_input != 0:
+                delete_query = f"DELETE FROM {selected_table} WHERE Cedula={c_cedula_input}"
             elif selected_table == "prod_venta" and pv_nventa_input != 0 and pv_idprod_input != 0:
-                delete_query = f"DELETE FROM prod_venta WHERE NroVenta={pv_nventa_input} AND ID_Producto={pv_idprod_input}"
+                delete_query = f"DELETE FROM {selected_table} WHERE NroVenta={pv_nventa_input} AND ID_Producto={pv_idprod_input}"
             elif selected_table == "productos" and p_id_input != 0:
-                delete_query = f"DELETE FROM productos WHERE id={p_id_input}"
+                delete_query = f"DELETE FROM {selected_table} WHERE id={p_id_input}"
             elif selected_table == "rol" and r_id_input != 0:
-                delete_query = f"DELETE FROM rol WHERE id={r_id_input}"
+                delete_query = f"DELETE FROM {selected_table} WHERE id={r_id_input}"
             elif selected_table == "usuarios" and u_id_input != 0:
-                delete_query = f"DELETE FROM usuarios WHERE id={u_id_input}"
+                delete_query = f"DELETE FROM {selected_table} WHERE id={u_id_input}"
             elif selected_table == "venta" and v_nventa_input != 0:
-                delete_query = f"DELETE FROM venta WHERE NroVenta={v_nventa_input}"
+                delete_query = f"DELETE FROM {selected_table} WHERE NroVenta={v_nventa_input}"
             
             if delete_query != "":
                 insert_data(delete_query)
