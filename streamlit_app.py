@@ -75,20 +75,28 @@ reportes = st.Page(
     title="Reportes", 
     icon="📊",
 )
+superusuario = st.Page(
+    "interfaces/Superusuario.py",
+    title="Gestion de DB",
+    icon="🔧"
+)
 
 #Paginas para cada rol
 account_pages = [logout_page, settings]
-empleado_pages = [Menu, historial, registrar_ventas,reportes]
-admin_pages = []
+empleado_pages = [Menu, registrar_ventas, reportes]
+admin_pages = [Menu, historial, registrar_ventas, reportes]
+superuser_pages = [Menu, historial, registrar_ventas, reportes, superusuario]
 
 st.title("POS Javeriana")
 
 #Genera un diccionario general en que se asignan las paginas a cada rol
 page_dict = {}
-if st.session_state.role in ["Vendedor", "Administrador"]:
+if st.session_state.role == "Vendedor":
     page_dict["Vendedor"] = empleado_pages
-if st.session_state.role == "Administrador":
+elif st.session_state.role == "Administrador":
     page_dict["Administrador"] = admin_pages
+elif st.session_state.role == "Superusuario":
+    page_dict["Superusuario"] = superuser_pages
 
 #Despliega las paginas por rol
 if len(page_dict) > 0:

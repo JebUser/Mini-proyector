@@ -49,9 +49,11 @@ def search_check(refresh, submitid, submitname):
 def insert_data(query, get_id=False):
     if get_id:
         data = connect.session.execute(text(query)).lastrowid
+        connect.commit()
         return data
     else:
         connect.session.execute(text(query))
+        connect.commit()
         return None
 
 #confirmar una venta
