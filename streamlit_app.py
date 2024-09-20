@@ -9,7 +9,7 @@ def check_credentials(username, password):
     query = f" SELECT u.usuario, u.contrasena, r.nombre as rol FROM usuarios u JOIN rol r ON u.rol_id = r.id WHERE u.usuario =\"{username}\" "
     result = connect.query(query)
         # Mostramos el DataFrame en Streamlit (opcional)
-    st.dataframe(result)
+    #st.dataframe(result)
     
     # Nos aseguramos de que hay un resultado
     if not result.empty:
