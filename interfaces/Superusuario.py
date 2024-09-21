@@ -95,7 +95,7 @@ with st.container():
     with add_part:
         add_button = st.button("Add")
         if add_button:
-            hashed_password = hash_password(u_contrasena_input)
+            
             # Guardas de seguridad: Este botón no hace nada si no se han llenado los campos necesarios
             add_query = ""
             if selected_table.lower() == "cliente" and c_cedula_input != 0 and c_nombre_input != "" and c_correo_input != "":
@@ -107,6 +107,7 @@ with st.container():
             elif selected_table == "rol" and r_id_input != 0:
                 add_query = f"INSERT INTO {selected_table} (id, nombre) VALUES ({r_id_input}, '{r_nombre_input}')"
             elif selected_table == "usuarios" and u_id_input != 0:
+                hashed_password = hash_password(u_contrasena_input)
                 add_query = f"INSERT INTO {selected_table} (id, nombre1, nombre2, apellido1, apellido2, usuario, contrasena, correo, cc, rol_id) VALUES ({u_id_input}, '{u_nombre1_input}', '{u_nombre2_input}', '{u_apellido1_input}', '{u_apellido2_input}', '{u_usuario_input}', '{hashed_password.decode('utf-8')}', '{u_correo_input}', {u_cc_input}, {u_rol_id_input})"
             elif selected_table == "venta" and v_nventa_input != 0 and v_idcliente_input != 0 and v_idempleado_input != 0 and v_fecha_input != None:
                 add_query = f"INSERT INTO {selected_table} (NroVenta, ID_Cliente, ID_Empleado, Fecha) VALUES ({v_nventa_input}, {v_idcliente_input}, {v_idempleado_input}, {v_fecha_input})"
@@ -122,7 +123,7 @@ with st.container():
     with edit_part:
         edit_button = st.button("Edit")
         if edit_button:
-            hashed_password = hash_password(u_contrasena_input)
+            
             edit_query = ""
             if selected_table.lower() == "cliente" and c_cedula_input != 0:
                 edit_query = f"UPDATE {selected_table} SET Nombre='{c_nombre_input}', Correo='{c_correo_input}' WHERE Cedula={c_cedula_input}"
@@ -133,6 +134,7 @@ with st.container():
             elif selected_table == "rol" and r_id_input != 0:
                 edit_query = f"UPDATE {selected_table} SET nombre='{r_nombre_input}' WHERE id={r_id_input}"
             elif selected_table == "usuarios" and u_id_input != 0:
+                hashed_password = hash_password(u_contrasena_input)
                 edit_query = f"UPDATE {selected_table} SET nombre1='{u_nombre1_input}', nombre2='{u_nombre2_input}', apellido1='{u_apellido1_input}', apellido2='{u_apellido2_input}', usuario='{u_usuario_input}', contrasena='{hashed_password.decode('utf-8')}', correo='{u_correo_input}', cc={u_cc_input}, rol_id={u_rol_id_input} WHERE id={u_id_input}"
             elif selected_table == "venta" and v_nventa_input != 0:
                 edit_query = f"UPDATE {selected_table} SET ID_Cliente={v_idcliente_input}, ID_Empleado={v_idempleado_input}, Fecha='{v_fecha_input}', WHERE NroVenta={v_nventa_input}"
