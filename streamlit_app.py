@@ -15,9 +15,10 @@ def check_credentials(username, password):
         #Extraemos la hashed password
         stored_hashed_password = result["contrasena"].iloc[0].encode('utf-8')
         # Comparamos la contraseña
-        if bcrypt.checkpw(password.encode('utf-8'), stored_hashed_password):
+        st.write(stored_hashed_password, password.encode('utf-8'))
+        #if bcrypt.checkpw(password.encode('utf-8'), stored_hashed_password):
+        if stored_hashed_password == password.encode('utf-8'):
             return result["rol"].iloc[0]  # Return the user role if the password matches
-        
         #if result["contrasena"].iloc[0] == password:
             #return result["rol"].iloc[0]
     return None
