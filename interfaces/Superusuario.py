@@ -91,11 +91,11 @@ with st.container():
             v_idempleado_input = st.number_input("(*) ID Empleado:", min_value=0, max_value=2147483647, value=0, step=1)
             v_fecha_input = st.date_input("(*) Fecha:", value=None)
 
-    hashed_password = hash_password(u_contrasena_input)
     add_part, edit_part, delete_part = st.columns(3)
     with add_part:
         add_button = st.button("Add")
         if add_button:
+            hashed_password = hash_password(u_contrasena_input)
             # Guardas de seguridad: Este botón no hace nada si no se han llenado los campos necesarios
             add_query = ""
             if selected_table.lower() == "cliente" and c_cedula_input != 0 and c_nombre_input != "" and c_correo_input != "":
@@ -122,6 +122,7 @@ with st.container():
     with edit_part:
         edit_button = st.button("Edit")
         if edit_button:
+            hashed_password = hash_password(u_contrasena_input)
             edit_query = ""
             if selected_table.lower() == "cliente" and c_cedula_input != 0:
                 edit_query = f"UPDATE {selected_table} SET Nombre='{c_nombre_input}', Correo='{c_correo_input}' WHERE Cedula={c_cedula_input}"
