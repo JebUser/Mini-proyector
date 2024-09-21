@@ -1,5 +1,6 @@
 import streamlit as st
 from connection import connect
+import bcrypt
 
 # Definición de usuarios y contraseñas (esto debería estar encriptado y almacenado en una base de datos en un entorno real)
 # Verificar credenciales en la base de datos
@@ -8,14 +9,17 @@ from connection import connect
 def check_credentials(username, password):
     query = f" SELECT u.usuario, u.contrasena, r.nombre as rol FROM usuarios u JOIN rol r ON u.rol_id = r.id WHERE u.usuario =\"{username}\" "
     result = connect.query(query)
-        # Mostramos el DataFrame en Streamlit (opcional)
-    #st.dataframe(result)
     
     # Nos aseguramos de que hay un resultado
     if not result.empty:
+        #Extraemos la hashed password
+        stored_hashed_password = result["contrasena"].iloc[0].encode('utf-8')
         # Comparamos la contraseña
-        if result["contrasena"].iloc[0] == password:
-            return result["rol"].iloc[0]
+        if bcrypt.checkpw(password.encode('utf-8'), stored_hashed_password):
+            return result["rol"].iloc[0]  # Return the user role if the password matches
+        
+        #if result["contrasena"].iloc[0] == password:
+            #return result["rol"].iloc[0]
     return None
 
 def login():
@@ -31,6 +35,8 @@ def login():
             st.success(f"Bienvenido {username}!")
             st.cache_data.clear()
             st.rerun()
+        elif username == '' or password == '':
+            st.warning("Ingrese credenciales")
         else:
             st.error("Usuario o contraseña incorrectos")
 
