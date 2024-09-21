@@ -1,6 +1,7 @@
 import streamlit as st
 from connection import connect
 from sqlalchemy import text
+import bcrypt
 
 # CopyPaste de Registrar ventas, para el boton de añadir entradas a una tabla
 def insert_data(query, get_id=False):
@@ -12,6 +13,15 @@ def insert_data(query, get_id=False):
         return None
 
 get_db_name = connect.query("SELECT DATABASE();") 
+
+#Function to hash password
+
+def hash_password(password):
+    # Generate a salt
+    salt = bcrypt.gensalt()
+    # Generate the hash of the password
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return hashed_password
 
 table_list_query = f"""
 SELECT table_name 
@@ -81,6 +91,7 @@ with st.container():
             v_idempleado_input = st.number_input("(*) ID Empleado:", min_value=0, max_value=2147483647, value=0, step=1)
             v_fecha_input = st.date_input("(*) Fecha:", value=None)
 
+    hashed_password = hash_password(u_contrasena_input)
     add_part, edit_part, delete_part = st.columns(3)
     with add_part:
         add_button = st.button("Add")
@@ -96,12 +107,15 @@ with st.container():
             elif selected_table == "rol" and r_id_input != 0:
                 add_query = f"INSERT INTO {selected_table} (id, nombre) VALUES ({r_id_input}, '{r_nombre_input}')"
             elif selected_table == "usuarios" and u_id_input != 0:
-                add_query = f"INSERT INTO {selected_table} (id, nombre1, nombre2, apellido1, apellido2, usuario, contrasena, correo, cc, rol_id) VALUES ({u_id_input}, '{u_nombre1_input}', '{u_nombre2_input}', '{u_apellido1_input}', '{u_apellido2_input}', '{u_usuario_input}', '{u_contrasena_input}', '{u_correo_input}', {u_cc_input}, {u_rol_id_input})"
+                add_query = f"INSERT INTO {selected_table} (id, nombre1, nombre2, apellido1, apellido2, usuario, contrasena, correo, cc, rol_id) VALUES ({u_id_input}, '{u_nombre1_input}', '{u_nombre2_input}', '{u_apellido1_input}', '{u_apellido2_input}', '{u_usuario_input}', '{hashed_password.decode('utf-8')}', '{u_correo_input}', {u_cc_input}, {u_rol_id_input})"
             elif selected_table == "venta" and v_nventa_input != 0 and v_idcliente_input != 0 and v_idempleado_input != 0 and v_fecha_input != None:
                 add_query = f"INSERT INTO {selected_table} (NroVenta, ID_Cliente, ID_Empleado, Fecha) VALUES ({v_nventa_input}, {v_idcliente_input}, {v_idempleado_input}, {v_fecha_input})"
             
             if add_query != "":
                 insert_data(add_query)
+                st.success("Usuario registrado correctamente")
+            else:
+                st.warning('Porfavor rellene los datos')
             
             st.cache_data.clear()
             st.rerun()
@@ -118,12 +132,13 @@ with st.container():
             elif selected_table == "rol" and r_id_input != 0:
                 edit_query = f"UPDATE {selected_table} SET nombre='{r_nombre_input}' WHERE id={r_id_input}"
             elif selected_table == "usuarios" and u_id_input != 0:
-                edit_query = f"UPDATE {selected_table} SET nombre1='{u_nombre1_input}', nombre2='{u_nombre2_input}', apellido1='{u_apellido1_input}', apellido2='{u_apellido2_input}', usuario='{u_usuario_input}', contrasena='{u_contrasena_input}', correo='{u_correo_input}', cc={u_cc_input}, rol_id={u_rol_id_input} WHERE id={u_id_input}"
+                edit_query = f"UPDATE {selected_table} SET nombre1='{u_nombre1_input}', nombre2='{u_nombre2_input}', apellido1='{u_apellido1_input}', apellido2='{u_apellido2_input}', usuario='{u_usuario_input}', contrasena='{hashed_password.decode('utf-8')}', correo='{u_correo_input}', cc={u_cc_input}, rol_id={u_rol_id_input} WHERE id={u_id_input}"
             elif selected_table == "venta" and v_nventa_input != 0:
                 edit_query = f"UPDATE {selected_table} SET ID_Cliente={v_idcliente_input}, ID_Empleado={v_idempleado_input}, Fecha='{v_fecha_input}', WHERE NroVenta={v_nventa_input}"
             
             if edit_query != "":
                 insert_data(edit_query)
+                st.success("Datos actualizados")
 
             st.cache_data.clear()
             st.rerun()
