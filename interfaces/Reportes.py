@@ -3,6 +3,8 @@ from connection import connect
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+from controller.ControladorPDF import ControladorPdf
+from io import BytesIO
 
 
 dia, semana, mes, año = st.tabs(["1D", "1W", "1M", "1Y"])
@@ -210,3 +212,16 @@ with año:
 
         # Display the plot
         st.pyplot(fig)
+
+st.header("Descargar Reporte")
+if st.button("Generar PDF"):
+    st.success("¡PDF generado con éxito!")
+    pdf = ControladorPdf()
+    pdf.generar_reporte(38981496, 92, 50, 49, "Banana")
+    pdf_out = pdf.output(dest='S').encode('latin1')
+    st.download_button(
+        label="Descargar PDF",
+        data = pdf_out,
+        file_name="sales report.pdf",
+        mime="application/pdf"
+    )
