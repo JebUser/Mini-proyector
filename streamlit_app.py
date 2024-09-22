@@ -137,17 +137,19 @@ def customization_menu():
 
 # Definición de usuarios y contraseñas
 def check_credentials(username, password):
-    query = f"SELECT u.usuario, u.contrasena, r.nombre as rol FROM usuarios u JOIN rol r ON u.rol_id = r.id WHERE u.usuario = '{username}'"
+    query = f" SELECT u.usuario, u.contrasena, r.nombre as rol FROM usuarios u JOIN rol r ON u.rol_id = r.id WHERE u.usuario =\"{username}\" "
     result = connect.query(query)
-
+    
+    # Nos aseguramos de que hay un resultado
     if not result.empty:
-        stored_password = result["contrasena"].iloc[0]
-        st.write("Stored password:", stored_password)
-        st.write("Password provided:", password)
-
-        if stored_password == password:
-            return result["rol"].iloc[0]
-
+        #Extraemos la hashed password
+        stored_hashed_password = result["contrasena"].iloc[0].encode('utf-8')
+        # Comparamos la contraseña
+        st.write(stored_hashed_password, password.encode('utf-8'))
+        if bcrypt.checkpw(password.encode('utf-8'), stored_hashed_password):
+        #if stored_hashed_password == password.encode('utf-8'):
+            return result["rol"].iloc[0]  # Return the user role if the password matches
+        
     return None
 
 def login():
