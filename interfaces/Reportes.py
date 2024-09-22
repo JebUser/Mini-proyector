@@ -2,7 +2,6 @@ import streamlit as st
 from connection import connect
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
 from controller.ControladorPDF import ControladorPdf
 from dateutil.relativedelta import relativedelta
 import os

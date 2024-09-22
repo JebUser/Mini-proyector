@@ -1,6 +1,7 @@
 import streamlit as st
 from connection import connect
-import pandas as pd
+
+st.title("Historial de Ventas")
 
 # Filtros
 st.subheader("Filters")

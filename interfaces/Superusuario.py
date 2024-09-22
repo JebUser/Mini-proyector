@@ -3,6 +3,8 @@ from connection import connect
 from sqlalchemy import text
 from controller.hashed_pass import hash_password
 
+st.title("Gestión BD")
+
 # CopyPaste de Registrar ventas, para el boton de añadir entradas a una tabla
 def insert_data(query, get_id=False):
     if get_id:

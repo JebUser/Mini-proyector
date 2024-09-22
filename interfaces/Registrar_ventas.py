@@ -6,6 +6,8 @@ import os
 from constants import IVA
 from datetime import datetime
 
+st.title("Registro de Ventas")
+
 # Inicialización de estados en Streamlit
 if "selected_products" not in st.session_state:
     st.session_state.selected_products = {}
