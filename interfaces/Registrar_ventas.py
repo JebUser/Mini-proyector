@@ -1,6 +1,10 @@
 import streamlit as st
 from connection import connect
 from sqlalchemy import text
+from controller.ControladorReciboPDF import PDF
+import os
+from constants import IVA
+from datetime import datetime
 
 # Inicialización de estados en Streamlit
 if "selected_products" not in st.session_state:
@@ -49,11 +53,11 @@ def search_check(refresh, submitid, submitname):
 def insert_data(query, get_id=False):
     if get_id:
         data = connect.session.execute(text(query)).lastrowid
-        connect.commit()
+        #connect.commit()
         return data
     else:
         connect.session.execute(text(query))
-        connect.commit()
+        #connect.commit()
         return None
 
 #confirmar una venta
@@ -61,9 +65,10 @@ def check_out(cliente_cc):
     if st.button("Confirmar Venta"):
         try:
             # Insertar en la tabla venta
+            id_empleado = connect.query(f"SELECT id FROM usuarios WHERE usuario=\"{st.session_state.username}\"").iloc[0]['id']
             query = f"""
                 INSERT INTO venta (ID_Cliente, ID_Empleado,Fecha)
-                VALUES ({cliente_cc}, {1}, CURRENT_DATE)
+                VALUES ({cliente_cc}, {id_empleado}, CURRENT_DATE)
             """
             # Obtener el número de la venta que se desea agregar.
             nro_venta = insert_data(query, get_id=True)
@@ -158,6 +163,44 @@ def display_selected_products():
     else:
         st.write("No hay productos seleccionados.")
 
+def generarReciboPDF(client_cc):
+    st.subheader('Generar Recibo')
+    if st.button('Generar recibo'):
+        pdf = PDF()
+        pdf.add_page()
+        date_of_purchase = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        # Add client information to the receipt
+        client_cc = int(client_cc)
+        data_empleado = connect.query(f"SELECT nombre1, nombre2 FROM usuarios WHERE usuario=\"{st.session_state.username}\"")
+        client_name = connect.query(f"SELECT nombre FROM cliente WHERE Cedula={client_cc}").iloc[0]['nombre']
+        pdf.add_client_info(client_cc, client_name, data_empleado.iloc[0]['nombre1'] + ' ' + data_empleado.iloc[0]['nombre2'], date_of_purchase)
+
+        # Add table header
+        pdf.add_table_header()
+
+        # Add products to the receipt
+        total = 0
+        for prod_id, details in st.session_state.selected_products.items():
+            name = details["name"]
+            qty = details["quantity"]
+            precio = connect.query(f"SELECT precio FROM productos WHERE id={prod_id}").iloc[0]['precio']
+            subtotal = precio * qty
+            pdf.add_product_row(name, qty, precio)
+            total += subtotal
+
+        # Add total amount
+        pdf.add_total(total)
+        pdf_out =  pdf.output(dest='S').encode('latin1')
+        # Output the PDF to a file
+        st.success("¡PDF generado con éxito!")
+        st.download_button(
+            label="Descargar PDF",
+            data = pdf_out,
+            file_name="receipt.pdf",
+            mime="application/pdf"
+        )
+
 with st.container():
     col1_add, col2_search, col3_summary = st.columns([10, 10, 8])
     refresh = False
@@ -201,6 +244,8 @@ with st.container():
 
         #si hay algun cliente asociado lo retorna    
         cliente_cc = buscar_cliente()
-        check_out(cliente_cc)
+        if st.session_state.selected_products:
+            generarReciboPDF(cliente_cc)
+            check_out(cliente_cc)
 
 st.cache_data.clear()
