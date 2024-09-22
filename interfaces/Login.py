@@ -1,28 +1,17 @@
 import streamlit as st
 
+# Crear el formulario de login
+with st.form("login_form"):
+    st.markdown("### JavePOS")
 
-# Create the form
-with st.form("My form"):
-    st.markdown("### JavePOS")  
+    # Inputs para el nombre de usuario y contraseña
+    username = st.text_input("Usuario", key="user")
+    password = st.text_input("Contraseña", type="password", key="password")
 
-    first = st.text_input("User", key="user")
-    last = st.text_input("Password", key="password", type="password")
-    
-    submit = st.form_submit_button("Submit")
+    # Botón de submit
+    submit = st.form_submit_button("Iniciar sesión", type="primary")
 
-
-# Apply additional custom CSS for the form
-css = """
-<style>
-    [data-testid="stForm"] {
-        background: #10B981;
-        padding: 20px;
-        border-radius: 30px;
-    }
-    [data-testid="stForm"] h3 {
-        text-align: center;
-    }
-</style>
-"""
-st.write(css, unsafe_allow_html=True)
-
+# Lógica para manejar el submit
+if submit:
+    # Aquí puedes agregar la lógica de autenticación
+    st.success(f"Bienvenido {username}!")
