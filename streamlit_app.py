@@ -16,11 +16,10 @@ def check_credentials(username, password):
         stored_hashed_password = result["contrasena"].iloc[0].encode('utf-8')
         # Comparamos la contraseña
         st.write(stored_hashed_password, password.encode('utf-8'))
-        #if bcrypt.checkpw(password.encode('utf-8'), stored_hashed_password):
-        if stored_hashed_password == password.encode('utf-8'):
+        if bcrypt.checkpw(password.encode('utf-8'), stored_hashed_password):
+        #if stored_hashed_password == password.encode('utf-8'):
             return result["rol"].iloc[0]  # Return the user role if the password matches
-        #if result["contrasena"].iloc[0] == password:
-            #return result["rol"].iloc[0]
+        
     return None
 
 def login():
@@ -33,6 +32,7 @@ def login():
         if role:
             st.session_state.authenticated = True
             st.session_state.role = role
+            st.session_state.username = username
             st.success(f"Bienvenido {username}!")
             st.cache_data.clear()
             st.rerun()
@@ -58,7 +58,7 @@ if "role" not in st.session_state:
 role = st.session_state.role
 #Paginas predeterminadas
 logout_page = st.Page(logout, title="Salir", icon=":material/logout:")
-settings = st.Page("settings.py", title="Settings", icon=":material/settings:")
+settings = st.Page("interfaces/settings.py", title="Settings", icon=":material/settings:")
 
 #Paginas para todos los roles
 Menu = st.Page(
