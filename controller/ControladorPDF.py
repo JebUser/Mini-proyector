@@ -1,5 +1,3 @@
-import os
-
 from fpdf import FPDF
 import pandas as pd
 from dateutil.relativedelta import relativedelta
@@ -20,7 +18,7 @@ class ControladorPdf(FPDF):
         # Intervalo de cálculo.
         self.set_xy(115, 17)
         self.set_font('Arial', '', 12)
-        self.cell(80, 10, f'(From {(pd.Timestamp.now() - relativedelta(years=1)).strftime('%d %b %Y')} to {pd.Timestamp.now().strftime('%d %b %Y')})')
+        self.cell(80, 10, f"(From {(pd.Timestamp.now() - relativedelta(years=1)).strftime('%d %b %Y')} to {pd.Timestamp.now().strftime('%d %b %Y')})")
 
         # TOTAL REVENUE
         # sombra.

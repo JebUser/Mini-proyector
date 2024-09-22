@@ -10,7 +10,6 @@ with st.form("My form"):
     
     submit = st.form_submit_button("Submit")
 
-   
 
 # Apply additional custom CSS for the form
 css = """

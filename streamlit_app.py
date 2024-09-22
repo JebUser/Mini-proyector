@@ -1,5 +1,6 @@
 import streamlit as st
 from connection import connect
+from controller.styles import login_style
 import bcrypt
 
 # Definición de usuarios y contraseñas (esto debería estar encriptado y almacenado en una base de datos en un entorno real)
@@ -22,25 +23,42 @@ def check_credentials(username, password):
         
     return None
 
+# Define the login function
 def login():
-    st.header("Iniciar Sesión")
-    username = st.text_input("Usuario")
-    password = st.text_input("Contraseña", type="password")
-    
-    if st.button("Iniciar sesión"):
-        role = check_credentials(username, password)
-        if role:
-            st.session_state.authenticated = True
-            st.session_state.role = role
-            st.session_state.username = username
-            st.success(f"Bienvenido {username}!")
-            st.cache_data.clear()
-            st.rerun()
-        elif username == '' or password == '':
-            st.warning("Ingrese credenciales")
-        else:
-            st.error("Usuario o contraseña incorrectos")
+    # Apply additional custom CSS for the login form
 
+    st.write(login_style, unsafe_allow_html=True)
+
+    st.markdown("# Jave POS")
+
+    # Create the form
+    with st.form("login_form"):
+        st.markdown("## Iniciar Sesión")
+        
+        # Create the text inputs for username and password
+        username = st.text_input("Usuario")
+        password = st.text_input("Contraseña", type="password")
+        
+        # Create the login button
+
+        columns = st.columns((2,1,2))
+
+        st.markdown('<span id="button-after"></span>', unsafe_allow_html=True)
+        submit = columns[1].form_submit_button("Iniciar sesión", type="primary")
+        
+        if submit:
+            role = check_credentials(username, password)
+            if role:
+                st.session_state.authenticated = True
+                st.session_state.role = role
+                st.session_state.username = username
+                st.success(f"Bienvenido {username}!")
+                st.cache_data.clear()
+                st.rerun()
+            elif username == '' or password == '':
+                st.warning("Ingrese credenciales")
+            else:
+                st.error("Usuario o contraseña incorrectos")
 #Salir de sesion
 def logout():
     st.session_state.authenticated = False
@@ -94,7 +112,7 @@ empleado_pages = [Menu, registrar_ventas, reportes]
 admin_pages = [Menu, historial, registrar_ventas, reportes]
 superuser_pages = [Menu, historial, registrar_ventas, reportes, superusuario]
 
-st.title("POS Javeriana")
+#st.title("POS Javeriana")
 
 #Genera un diccionario general en que se asignan las paginas a cada rol
 page_dict = {}
