@@ -58,7 +58,7 @@ if "role" not in st.session_state:
 role = st.session_state.role
 #Paginas predeterminadas
 logout_page = st.Page(logout, title="Salir", icon=":material/logout:")
-settings = st.Page("interfaces/settings.py", title="Settings", icon=":material/settings:")
+settings = st.Page("interfaces/settings.py", title="Ajustes", icon=":material/settings:")
 
 #Paginas para todos los roles
 Menu = st.Page(

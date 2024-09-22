@@ -1,7 +1,7 @@
 import streamlit as st
 from connection import connect
 from sqlalchemy import text
-import bcrypt
+from controller.hashed_pass import hash_password
 
 # CopyPaste de Registrar ventas, para el boton de añadir entradas a una tabla
 def insert_data(query, get_id=False):
@@ -15,13 +15,6 @@ def insert_data(query, get_id=False):
 get_db_name = connect.query("SELECT DATABASE();") 
 
 #Function to hash password
-
-def hash_password(password):
-    # Generate a salt
-    salt = bcrypt.gensalt()
-    # Generate the hash of the password
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
-    return hashed_password
 
 table_list_query = f"""
 SELECT table_name 
