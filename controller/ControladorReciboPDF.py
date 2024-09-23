@@ -1,5 +1,6 @@
 from fpdf import FPDF
 from datetime import datetime
+from constants import IVA
 
 # Create a PDF class extending FPDF
 class PDF(FPDF):
@@ -44,3 +45,10 @@ class PDF(FPDF):
         self.cell(110, 10, 'Total', 1)
         self.cell(30, 10, f'${total:.2f}', 1)
         self.ln()
+    
+    def add_iva(self, total):
+        self.set_font('Arial', 'B', 10)
+        self.cell(110, 10, 'Total+IVA', 1)
+        self.cell(30, 10, f'${total+total*IVA:.2f}', 1)
+        self.ln()
+    

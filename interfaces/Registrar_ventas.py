@@ -193,6 +193,7 @@ def generarReciboPDF(client_cc):
 
         # Add total amount
         pdf.add_total(total)
+        pdf.add_iva(total)
         pdf_out =  pdf.output(dest='S').encode('latin1')
         # Output the PDF to a file
         st.success("¡PDF generado con éxito!")
